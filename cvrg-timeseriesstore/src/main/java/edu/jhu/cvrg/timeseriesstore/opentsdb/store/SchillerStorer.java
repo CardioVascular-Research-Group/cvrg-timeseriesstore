@@ -1,58 +1,57 @@
 package edu.jhu.cvrg.timeseriesstore.opentsdb.store;
+/*
+Copyright 2015 Johns Hopkins University Institute for Computational Medicine
 
-import java.io.File;
-import java.io.IOException;
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+* @author Chris Jurado
+*/
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
-import javax.xml.bind.JAXBException;
-
-import org.cvrgrid.schiller.DecodedLead;
-import org.cvrgrid.schiller.PreprocessReturn;
-import org.cvrgrid.schiller.SchillerEcgFiles;
-
 import edu.jhu.cvrg.timeseriesstore.model.IncomingDataPoint;
-import edu.jhu.cvrg.timeseriesstore.model.TimeSeriesData;
-import edu.jhu.cvrg.timeseriesstore.util.TimeSeriesUtility;
+import edu.jhu.icm.ecgFormatConverter.ECGFileData;
+import edu.jhu.icm.ecgFormatConverter.ECGFormatReader;
+import edu.jhu.icm.enums.DataFileFormat;
 
 public class SchillerStorer extends OpenTSDBTimeSeriesStorer {
 
 	@Override
-	protected ArrayList<IncomingDataPoint> extractTimePoints(
-			InputStream inputStream, String[] channels, int samples, long epochTime) {
+	protected ArrayList<IncomingDataPoint> extractTimePoints(InputStream inputStream, String[] channels, int samples, long epochTime) {
 		
 		ArrayList<IncomingDataPoint> dataPoints = new ArrayList<IncomingDataPoint>();
-		DecodedLead[] leadData = null;
-		int allocatedChannels = 0;
-		int time = 0;
-		
-		File inputFile = TimeSeriesUtility.createTempFile(inputStream, "schiller");
-		PreprocessReturn ret;
-		try {
-			ret = SchillerEcgFiles.preprocess(inputFile);
-			leadData = ret.getDecodedLeads();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
-		allocatedChannels = leadData.length;
+		ECGFormatReader reader = new ECGFormatReader();
+		ECGFileData data = reader.read(DataFileFormat.SCHILLER, inputStream);
 
-		for(int i=0; i < allocatedChannels; i++) {
+		int[][] leadData = data.data;
+		int leads = data.channels;
+
+		for(int i=0; i < leads; i++) {
 			long currentTime = epochTime;
-			for(int j=0; j < leadData[i].size(); j++) {
+			for(int j=0; j < leadData[0].length; j++) {
+				
 				String channel = getChannelName(i, channels);
 			    HashMap<String, String> tags = new HashMap<String, String>();
-			    tags.put("format", "schiller");
-				dataPoints.add(new IncomingDataPoint("ecg." + channel + ".uv", currentTime, String.valueOf(leadData[i].get(j)), tags));
+			    tags.put("format","schiller");
+			    
+				dataPoints.add(new IncomingDataPoint("ecg.uv." + channel, currentTime, String.valueOf(leadData[i][j]), tags));
+				
 				currentTime ++;
 			}
-		}
+		}	
 		return dataPoints;
 	}
 }

@@ -20,10 +20,10 @@ limitations under the License.
 */
 import edu.jhu.cvrg.timeseriesstore.enums.EnumTimeSeriesDatabaseType;
 import edu.jhu.cvrg.timeseriesstore.enums.EnumTimeSeriesStorerType;
-import edu.jhu.cvrg.timeseriesstore.opentsdb.retrieve.OpenTSDBTimeSeriesRetriever;
-import edu.jhu.cvrg.timeseriesstore.opentsdb.retrieve.TimeSeriesRetriever;
 import edu.jhu.cvrg.timeseriesstore.opentsdb.store.OpenTSDBTimeSeriesStorer;
 import edu.jhu.cvrg.timeseriesstore.opentsdb.store.OpenTSDBTimeSeriesStorerFactory;
+import edu.jhu.cvrg.timeseriesstore.query.OpenTSDBTimeSeriesRetrieverWrapper;
+import edu.jhu.cvrg.timeseriesstore.query.GenericTimeSeriesRetriever;
 
 
 public class TimeSeriesUtilityFactory {
@@ -40,11 +40,11 @@ public class TimeSeriesUtilityFactory {
 		}
 	}
 	
-	public static TimeSeriesRetriever returnTimeSeriesRetrieverUtility(EnumTimeSeriesDatabaseType timeSeriesDatabase){
+	public static GenericTimeSeriesRetriever returnTimeSeriesRetrieverUtility(EnumTimeSeriesDatabaseType timeSeriesDatabase){
 
 		switch(timeSeriesDatabase){
 		case OPENTSDB:
-			return new OpenTSDBTimeSeriesRetriever();
+			return new OpenTSDBTimeSeriesRetrieverWrapper();
 		default:
 			return null;	
 		}

@@ -24,19 +24,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 import edu.jhu.cvrg.timeseriesstore.model.IncomingDataPoint;
-import edu.jhu.cvrg.timeseriesstore.model.TimeSeriesData;
 
 public class MuseStorer extends OpenTSDBTimeSeriesStorer {
 
-
-
 	@Override
-	protected ArrayList<IncomingDataPoint> extractTimePoints(
-			InputStream inputStream, String[] channels, int samples, long epochTime) {
+	protected ArrayList<IncomingDataPoint> extractTimePoints(InputStream inputStream, String[] channels, int samples, long epochTime) {
 		
 		ArrayList<IncomingDataPoint> dataPoints = new ArrayList<IncomingDataPoint>();
 		
@@ -53,9 +48,7 @@ public class MuseStorer extends OpenTSDBTimeSeriesStorer {
 		    while ((strLine = br.readLine()) != null)   {
 		      // Print the content on the console
 		    	if(strLine.length()>0) {
-		    		System.out.println (strLine);
 		    		words = strLine.split("\\s");
-		    		System.out.println("Words is " + words);
 	    			channelCount = Integer.parseInt(words[4]);
 	    			if(channelCount != channels.length){
 	    				channelCount = channels.length;
@@ -88,13 +81,11 @@ public class MuseStorer extends OpenTSDBTimeSeriesStorer {
 					String channel = getChannelName(c, channels);
 				    HashMap<String, String> tags = new HashMap<String, String>();
 				    tags.put("format", "gemuse");
-					dataPoints.add(new IncomingDataPoint("ecg." + channel + ".uv", time, String.valueOf(value), tags));
+					dataPoints.add(new IncomingDataPoint("ecg.uv." + channel, time, String.valueOf(value), tags));
 					time ++;
 					}
 		    	}
 		    }
-
-
 			geMuseDis.close();
 		} catch (IOException e) {
 			e.printStackTrace();

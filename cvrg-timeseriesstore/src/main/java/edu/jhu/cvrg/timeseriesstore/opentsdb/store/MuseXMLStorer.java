@@ -23,27 +23,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import edu.jhu.cvrg.timeseriesstore.model.IncomingDataPoint;
-import edu.jhu.icm.ecgFormatConverter.muse.MuseXML_wrapper;
+import edu.jhu.icm.ecgFormatConverter.ECGFileData;
+import edu.jhu.icm.ecgFormatConverter.ECGFormatReader;
+import edu.jhu.icm.enums.DataFileFormat;
 
 public class MuseXMLStorer extends OpenTSDBTimeSeriesStorer {
 
 	@Override
 	protected ArrayList<IncomingDataPoint> extractTimePoints(InputStream inputStream, String[] channels, int samples, long epochTime) {
-
-		System.out.println("Storing MuseXML data");
 		
 		ArrayList<IncomingDataPoint> dataPoints = new ArrayList<IncomingDataPoint>();
-		MuseXML_wrapper museWrapper = new MuseXML_wrapper();
-		museWrapper.parse(inputStream);
-		int[][] dataList = museWrapper.getData();
+		ECGFormatReader reader = new ECGFormatReader();
+		ECGFileData data = reader.read(DataFileFormat.MUSEXML, inputStream);
+		int[][] dataList = data.data;
 		
 		if(dataList == null){
-			System.out.println("Returned empty data.");
 			return null;
 		}
-		
-		long sampleInterval = (long) (1000/museWrapper.getSamplingRate());
-		
+
+		long sampleInterval = (long) (1000/data.samplingRate);
 		
 		for(int i = 0; i < dataList.length; i++){
 			
@@ -52,13 +50,11 @@ public class MuseXMLStorer extends OpenTSDBTimeSeriesStorer {
 				
 				String channel = getChannelName(i, channels);
 			    HashMap<String, String> tags = new HashMap<String, String>();
-			    tags.put("format","GEMUSEXML");
-				dataPoints.add(new IncomingDataPoint("ecg." + channel + ".uv", dataTime, String.valueOf(dataList[i][j]), tags));
+			    tags.put("format","gemusexml");
+				dataPoints.add(new IncomingDataPoint("ecg.uv." + channel, dataTime, String.valueOf(dataList[i][j]), tags));
 				dataTime = dataTime + sampleInterval;
 			}
 		}
-
 		return dataPoints;
 	}
-
 }

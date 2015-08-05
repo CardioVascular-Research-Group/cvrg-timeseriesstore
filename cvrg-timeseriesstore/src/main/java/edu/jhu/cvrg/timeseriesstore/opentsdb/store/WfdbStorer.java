@@ -1,17 +1,4 @@
 package edu.jhu.cvrg.timeseriesstore.opentsdb.store;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-import edu.jhu.cvrg.timeseriesstore.model.IncomingDataPoint;
-import edu.jhu.cvrg.timeseriesstore.model.TimeSeriesData;
-
 /*
 Copyright 2015 Johns Hopkins University Institute for Computational Medicine
 
@@ -29,15 +16,22 @@ limitations under the License.
 */
 /**
 * @author Chris Jurado
-* 
 */
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import edu.jhu.cvrg.timeseriesstore.model.IncomingDataPoint;
+
 public class WfdbStorer extends OpenTSDBTimeSeriesStorer {
 	
 	String[] signalName = null;
 
 	@Override
-	protected ArrayList<IncomingDataPoint> extractTimePoints(
-			InputStream inputStream, String[] channels, int samples, long epochTime) {
+	protected ArrayList<IncomingDataPoint> extractTimePoints(InputStream inputStream, String[] channels, int samples, long epochTime) {
 		
 		ArrayList<IncomingDataPoint> dataPoints = new ArrayList<IncomingDataPoint>();
 

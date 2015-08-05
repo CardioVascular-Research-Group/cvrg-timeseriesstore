@@ -18,38 +18,27 @@ limitations under the License.
 * @author Chris Jurado
 * 
 */
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.xml.bind.JAXBException;
-
 import edu.jhu.cvrg.timeseriesstore.model.IncomingDataPoint;
-import edu.jhu.cvrg.timeseriesstore.util.TimeSeriesUtility;
-import edu.jhu.icm.ecgFormatConverter.philips.Philips103_wrapper;
+import edu.jhu.icm.ecgFormatConverter.ECGFileData;
+import edu.jhu.icm.ecgFormatConverter.ECGFormatReader;
+import edu.jhu.icm.enums.DataFileFormat;
 
-public class Phillips103Storer extends PhillipsStorer {
+public class Phillips103Storer extends OpenTSDBTimeSeriesStorer {
 
 	@Override
 	protected ArrayList<IncomingDataPoint> extractTimePoints(InputStream inputStream, String[] channels, int samples, long epochTime) {
 		
 		ArrayList<IncomingDataPoint> dataPoints = new ArrayList<IncomingDataPoint>();
-		
-		Philips103_wrapper phillips103Wrapper = new Philips103_wrapper();
 
-		try {
-			phillips103Wrapper.init(inputStream);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} 
-		phillips103Wrapper.parse();
-		int[][] leadData = phillips103Wrapper.getData();
-		int sampleCount = phillips103Wrapper.getNumberOfPoints();
-		int leads = phillips103Wrapper.getChannels();
+		ECGFormatReader reader = new ECGFormatReader();
+		ECGFileData data = reader.read(DataFileFormat.PHILIPS103, inputStream);
+
+		int[][] leadData = data.data;
+		int leads = data.channels;
 
 		for(int i=0; i < leads; i++) {
 			long currentTime = epochTime;
@@ -59,7 +48,7 @@ public class Phillips103Storer extends PhillipsStorer {
 			    HashMap<String, String> tags = new HashMap<String, String>();
 			    tags.put("format","phillips103");
 			    
-				dataPoints.add(new IncomingDataPoint("ecg." + channel + ".uv", currentTime, String.valueOf(leadData[i][j]), tags));
+				dataPoints.add(new IncomingDataPoint("ecg.uv." + channel, currentTime, String.valueOf(leadData[i][j]), tags));
 				
 				currentTime ++;
 			}
