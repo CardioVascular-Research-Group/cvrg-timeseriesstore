@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import edu.jhu.cvrg.timeseriesstore.enums.EnumTimeSeriesDatabaseType;
@@ -189,7 +190,7 @@ public class AppTest extends TestCase {
     	boolean result = false;
     	HashMap<String, String> tags = new HashMap<String, String>();
     	tags.put("format", "hl7aecg");
-    	JSONArray array = TimeSeriesRetriever.retrieveTimeSeries(OPENTSDB_URL, 1420088400000L, 1425501345000L, "ecg.I.uv", tags);
+    	JSONObject array = TimeSeriesRetriever.retrieveTimeSeries(OPENTSDB_URL, 1420088400000L, 1425501345000L, "ecg.I.uv", tags);
     	System.out.println(array.toString());
     	assertTrue(array != null);
     }
